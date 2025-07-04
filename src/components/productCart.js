@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, memo } from 'react';
+import React, { useContext, useState, useCallback, memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import iconShopping from '../assets/images/iconShopping.png';
 import Detail from './detail';
