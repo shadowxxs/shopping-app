@@ -10,7 +10,8 @@ const ProductCart = memo((props) => {
   const [showModal, setShowModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
-  const product = { id, name, price, image, description };
+   const product = useMemo(() => ({ id, name, price, image, description }), [id, name, price, image, description]) ;
+
 
   const handleMinusQuantity = useCallback(() => {
     setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
