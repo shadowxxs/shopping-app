@@ -1,57 +1,70 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
-import iconShopping from '../assets/images/iconShopping.png'
+import iconShopping from '../assets/images/iconShopping.png';
 import Detail from './detail';
 import { CartContext } from '../context/cartContext';
-const ProductCart = (props) => {
-  const {addToCart} = useContext(CartContext)
-  const {id, name, price, image, description} = props.data;
+
+const ProductCart = memo((props) => {
+  const { addToCart } = useContext(CartContext);
+  const { id, name, price, image, description } = props.data;
   const [showModal, setShowModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
+  const product = { id, name, price, image, description };
 
-  const product = {id, name, price, image, description};
+  const handleMinusQuantity = useCallback(() => {
+    setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  }, []);
 
-  const handleMinusQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    } else {  
-      setQuantity(1);
-    }
-  }
-  const handlePlusQuantity = () => {
-    setQuantity(quantity + 1);
-  };
+  const handlePlusQuantity = useCallback(() => {
+    setQuantity(prevQuantity => prevQuantity + 1);
+  }, []);
+
+  const handleAddToCart = useCallback(() => {
+    addToCart({ ...product, quantity });
+  }, [addToCart, product, quantity]);
+
+  const openModal = useCallback(() => {
+    setShowModal(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
   return (
-    <div className=' bg-white rounded-xl shadow-sm p-5'>
-      <Link to={id}>
-      <img src={image} alt='' className='w-full h-80 ' onClick={() => setShowModal(true) }/>
-      </Link>
-    <h3 className='text-2xl py-3 text-center font-medium'>{name}</h3>
-
-    <div className='flex items-center justify-between'>
-      <div>
-        <div className='flex justify-between items-center gap-6 p-2 '>
-        <span className='text-2xl font-medium rounded-md'>Rp.{price.toLocaleString()}</span>
-        <button className='text-md font-light  hover:text-lg  ' onClick={() => setShowModal(true)}>Detail</button>
+    <div className='bg-white rounded-xl shadow-lg overflow-hidden flex flex-col'>
+      <div className="relative">
+        <Link to={id} onClick={openModal}>
+          <img src={image} alt={name} className='w-full h-64 object-cover' />
+        </Link>
+      </div>
+      <div className='p-4 flex flex-col flex-grow'>
+        <h3 className='text-lg sm:text-xl font-semibold text-center mb-2 flex-grow'>{name}</h3>
+        <div className='flex justify-between items-center mb-4'>
+          <span className='text-lg sm:text-2xl font-bold text-gray-800'>Rp.{price.toLocaleString()}</span>
+          <button className='text-sm text-blue-500 hover:underline' onClick={openModal}>Detail</button>
         </div>
-        <div className='flex gap-5'>
-          <div className=' flex gap-1 justify-center items-center'>
-         <button className='bg-gray-100 h-full w-8 font-bold text-xl rounded-xl flex justify-center items-center' onClick={handleMinusQuantity}>-</button>
-              <span className='bg-gray-50 h-full w-8 font-bold text-xl rounded-xl flex justify-center items-center'>{quantity}</span>
-              <button className='bg-gray-100 h-full w-8 font-bold text-xl rounded-xl flex justify-center items-center' onClick={handlePlusQuantity}>+</button>      
-              </div>
-        <button className='bg-gray-300 p-2 rounded-md text-sm hover:bg-gray-400 flex ' onClick={() => addToCart({ ...product, quantity})}><img src={iconShopping} alt='' className='w-5'/>Keranjang</button>
-        </div>  
-    </div>
-    </div>
+        <div className='flex flex-col sm:flex-row gap-4'>
+          <div className='flex items-center justify-center gap-2'>
+            <button className='bg-gray-200 h-8 w-8 font-bold text-lg rounded-full flex justify-center items-center transition-colors hover:bg-gray-300' onClick={handleMinusQuantity}>-</button>
+            <span className='bg-gray-100 h-8 w-10 font-bold text-lg rounded-md flex justify-center items-center'>{quantity}</span>
+            <button className='bg-gray-200 h-8 w-8 font-bold text-lg rounded-full flex justify-center items-center transition-colors hover:bg-gray-300' onClick={handlePlusQuantity}>+</button>
+          </div>
+          <button className='bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 flex items-center justify-center gap-2 transition-colors w-full' onClick={handleAddToCart}>
+            <img src={iconShopping} alt='' className='w-5 h-5' />
+            <span>Keranjang</span>
+          </button>
+        </div>
+      </div>
 
-    <Detail
-    show={showModal}
-    onClose={() => setShowModal(false)}
-    product={{id, name, price, image, description}} />
+      <Detail
+        show={showModal}
+        onClose={closeModal}
+        product={{ id, name, price, image, description }}
+      />
     </div>
-  )
-}
+  );
+});
 
-export default ProductCart
+export default ProductCart;

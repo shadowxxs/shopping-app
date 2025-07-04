@@ -8,11 +8,3 @@ html, body {
   overflow-x: hidden; /* cegah horizontal scroll */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
